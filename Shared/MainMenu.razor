@@ -1,0 +1,170 @@
+@inject Dictionary english
+@inject IJSRuntime js
+
+<Logo></Logo>
+<div class="@(state == MenuState.Playing ? "w3-hide" : "w3-show")">
+    <div style="width: 360px; max-width: 100%; margin-left:auto; margin-right: auto;">
+        @if (state == MenuState.Root) {
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=chooseMode>Play Now</button><br>
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=quickPlay>Word of the Day</button>
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=showStats>Statistics</button>
+        } else if (state == MenuState.ChooseMode) {
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=@(() => playRandomWithLetters(3))>3 Letter Word<br><small>@english.CountWordsOfLength(3) word(s)</small></button><br>
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=@(() => playRandomWithLetters(5))>5 Letter Word<br><small>@english.CountWordsOfLength(5) word(s)</small></button><br>
+            <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=@(() => playRandomWithLetters(7))>7 Letter Word<br><small>@english.CountWordsOfLength(7) word(s)</small></button><br>
+            <button class="w3-button w3-round w3-orange w3-margin-bottom w3-animate-opacity" style="width: 100%" @onclick=mainMenu>&lt; Back</button><br>
+        }
+    </div>
+</div>
+<div class="@(state != MenuState.Playing ? "w3-hide" : "w3-show")">
+    <Grid @ref=gameGrid OnVictory="@showVictory" OnDefeat="@showDefeat"></Grid>
+    <div class="w3-center w3-padding">
+    @if (gameGrid != null && gameGrid.State != GameState.Playing) {
+        <button class="w3-button w3-round w3-blue w3-margin-bottom w3-animate-opacity" @onclick=closeResultsScreenAndReturnToMenu>Return to Menu?</button>
+    }
+    </div>
+</div>
+
+<div class="w3-modal @(showResultsScreen ? "w3-show" : "w3-hide")">
+    <div class="w3-modal-content w3-round-xlarge">
+        <header class="w3-center">
+            <h2>@resultsHeader</h2>
+            <div>@resultsText</div>
+            @if (!string.IsNullOrEmpty(answerText)) {
+                <a class="w3-large" target="_blank" href="https://www.merriam-webster.com/dictionary/@answerText">@answerText</a>
+            }
+            <span class="w3-button w3-display-topright" @onclick=closeResultsScreen>&times;</span>
+        </header>
+        <div class="w3-container">
+            <h3>Statistics</h3>
+            <div class="w3-row-padding w3-center">
+                <div class="w3-quarter">
+                    @playerStats.GamesPlayed<br><small>played</small>
+                </div>
+                <div class="w3-quarter">
+                    @playerStats.WinPercentageInt<br><small>win %</small>
+                </div>
+                <div class="w3-quarter">
+                    @playerStats.CurrentWinStreak<br><small>current streak</small>
+                </div>
+                <div class="w3-quarter">
+                    @playerStats.MaxWinStreak<br><small>max streak</small>
+                </div>
+            </div>
+            @if (playerStats.GuessDistribution != null) {
+            <div>
+                <h3>Guess Distribution</h3>
+                @foreach (var pair in playerStats.GuessDistribution.OrderBy(p => p.Key)) {
+                    <div class="w3-row w3-margin-bottom">
+                        <div class="w3-col" style="width: 2em;">@pair.Key</div>
+                        <div class="w3-rest">
+                            <div style="display: inline-block; width: @(((float)pair.Value/(float)playerStats.GamesWon) * 100)%;" class="w3-center w3-gray w3-text-white">@pair.Key</div>
+                        </div>
+                    </div>
+                }
+            </div>
+            }
+            <footer class="w3-center w3-padding">
+                <button class="w3-button w3-round w3-blue w3-margin-left" @onclick=closeResultsScreen>Close Statistics</button>
+                <button class="w3-button w3-round w3-blue w3-margin-right" @onclick=closeResultsScreenAndReturnToMenu>Exit to Main Menu</button>
+            </footer>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    enum MenuState {
+        Root,
+        ChooseMode,
+        Playing
+    }
+    private MenuState state;
+    private Grid? gameGrid;
+
+    private void chooseMode() {
+        this.state = MenuState.ChooseMode;
+    }
+    private void mainMenu() {
+        this.state = MenuState.Root;
+    }
+
+    private void playRandomWithLetters(int letters) {
+        var word = english.GetRandomWordOfLength(letters);
+        if (word != null) {
+            gameGrid?.Reconfigure(letterCount: letters, retries: letters + 1);
+            gameGrid?.Start(word);
+            this.state = MenuState.Playing;
+        }
+    }
+
+    private void quickPlay() {
+        var word = english.Get5LetterWordOfTheDay();
+        gameGrid?.Reconfigure(letterCount: 5, retries: 6);
+        gameGrid?.Start(word);
+        this.state = MenuState.Playing;
+    }
+
+    private bool showResultsScreen = false;
+    private string? resultsHeader;
+    private string? resultsText;
+    private string? answerText;
+    private Statistics playerStats = new Statistics();
+    protected override async Task OnAfterRenderAsync(bool first) {
+        if (first) {
+            var stats = await js.InvokeAsync<string>("window.localStorage.getItem", "wordlike.statistics.json");
+            if (!string.IsNullOrEmpty(stats)) {
+                try {
+                    var parsed = System.Text.Json.JsonSerializer.Deserialize<Statistics>(stats);
+                    this.playerStats = parsed ?? this.playerStats;
+                } catch {
+                    this.playerStats = new Statistics();
+                }
+            }
+        }
+    }
+
+    private void saveStats() {
+        js.InvokeVoidAsync("window.localStorage.setItem", "wordlike.statistics.json", System.Text.Json.JsonSerializer.Serialize(this.playerStats));
+    }
+
+    private void showStats() {
+        resultsHeader = "Game History";
+        resultsText = string.Empty;
+        answerText = string.Empty;
+        showResultsScreen = true;
+    }
+    private void showVictory() {
+        resultsHeader = "Congrats!";
+        resultsText = "You entered the correct word.";
+        showResultsScreen = true;
+        answerText = gameGrid?.GetAnswerWord();
+        playerStats.AddWin(gameGrid?.GuessCount ?? 1);
+        saveStats();
+        StateHasChanged();
+    }
+
+    private void showDefeat() {
+        resultsHeader = "Sorry";
+        answerText = string.Empty;
+        if (gameGrid != null && !string.IsNullOrEmpty(gameGrid.GetAnswerWord())) {
+            resultsText = $"The word was actually...";
+            answerText = gameGrid.GetAnswerWord();
+        } else {
+            resultsText = "Please try again...";
+        }
+        showResultsScreen = true;
+        playerStats.AddLoss();
+        saveStats();
+        StateHasChanged();
+    }
+
+    private void closeResultsScreenAndReturnToMenu() {
+        this.showResultsScreen = false;
+        this.state = MenuState.Root;
+    }
+
+    private void closeResultsScreen() {
+        this.showResultsScreen = false;
+    }
+}

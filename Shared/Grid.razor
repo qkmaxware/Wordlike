@@ -1,0 +1,111 @@
+<div @onkeyup=pressChar tabindex="0" class="grid">
+<CascadingValue Value="this">
+    @for (var i = 0; i < Tries; i++) {
+        <Row LetterCount=@LetterCount></Row>
+    }
+</CascadingValue>
+</div>
+<UsedLetters @ref=letters OnLetterPressed="@pressCharUi"></UsedLetters>
+
+@code {
+    [Parameter]public int LetterCount {get; set;} = 5;
+    [Parameter] public int Tries {get; set;} = 5;
+    public Row? Current => rowIndex >= 0 && rowIndex < rows.Count ? rows[rowIndex] : null;
+    private int rowIndex = 0;
+    public int GuessCount => rowIndex + 1;
+    private List<Row> rows = new List<Row>();
+    public Row? ActiveRow => rowIndex >=0 && rowIndex < rows.Count ? rows[rowIndex] : null;
+    private bool hasNextRow() => ((rowIndex +1) >= 0) && ((rowIndex + 1) < rows.Count);
+
+    public void AddRow(Row row) {
+        this.rows.Add(row);
+    }
+    public void RemoveRow(Row row) {
+        this.rows.Remove(row);
+    }
+
+    public void Reconfigure(int letterCount = 5, int retries = 5) {
+        this.LetterCount = letterCount;
+        this.Tries = retries;
+        this.Reset();
+    }
+
+    public GameState State {get; private set;}
+    private UsedLetters? letters;
+    [Parameter]public Action? OnVictory {get; set;}
+    [Parameter]public Action? OnDefeat {get; set;}
+    public void Reset() {
+        State = GameState.Playing;
+        foreach (var row in rows)
+            row.Reset();
+        this.rowIndex = 0;
+        letters?.Reset();
+        StateHasChanged();
+    }
+
+    private string? word;
+    public string? GetAnswerWord() => word;
+    public void Start(string? word) {
+        this.word = word;
+        Reset();
+    }
+
+    public void pressCharUi(LetterState state, char letter) {
+        if (State != GameState.Playing)
+            return;
+
+        if (state != LetterState.Unused) {
+            return;
+        }
+
+        var row = this.ActiveRow;
+        if (row == null)
+            return;
+
+        row.ActiveCell?.SetLetter(letter);
+        row.NextLetter();
+    }
+    public void pressChar(KeyboardEventArgs e) {
+        if (State != GameState.Playing)
+            return;
+            
+        var row = this.ActiveRow;
+        if (row == null)
+            return;
+        if (this.State != GameState.Playing)
+            return;
+        
+        if (e.Key == "Enter") {
+            if (row.Status == RowStatus.RowComplete) {
+                var isValid = row.Validate(this.word);
+                letters?.MarkUsed(row.GetWord());
+                if (isValid) {
+                    // Game is done congrats!! 
+                    victory();
+                } else {
+                    if (hasNextRow()) {
+                        this.rowIndex++;
+                    } else {
+                        defeat();
+                    }
+                }
+            }
+        } else if (e.Key == "Backspace") {
+            row.PrevLetter();
+            row.ActiveCell?.SetLetter(default(char));
+        } else if (e.Key.Length == 1 && char.IsLetter(e.Key[0])) {
+            row.ActiveCell?.SetLetter(e.Key[0]);
+            row.NextLetter();
+        }
+    }
+
+    private void victory() {
+        State = GameState.Victory;
+        OnVictory?.Invoke();
+    }
+
+    private void defeat() {
+        State = GameState.Defeat;
+        OnDefeat?.Invoke();
+    }
+}

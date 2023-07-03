@@ -1,0 +1,52 @@
+@implements IDisposable 
+
+<div class="w3-animate-zoom cell no-select" style="@(style);">
+    @if(char.IsLetter(Letter)) {
+        <text>@char.ToUpper(Letter)</text>
+    } else {
+        <text>&nbsp;</text>
+    }
+</div>
+
+@code {
+    public char Letter {get; private set;}
+    private CellState state;
+    private string style {
+        get {
+            return state switch {
+                CellState.RightLetterWrongPlace => "background-color: darkgoldenrod;",
+                CellState.RightLetterRightPlace => "background-color: green;",
+                CellState.WrongLetter           => "background-color: red;",
+                _                               => "",
+            };
+        }
+    }
+    [CascadingParameter] public Row? Owner {get; set;}
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Owner?.AddCell(this);
+    }
+
+    public void Dispose() {
+        Owner?.RemoveCell(this);
+    }
+
+    public int CellIndex => Owner?.CellIndex(this) ?? -1;
+
+    public void SetState(CellState state) {
+        this.state = state;
+        StateHasChanged();
+    }
+
+    public void SetLetter(char c) {
+        this.Letter = c;
+        StateHasChanged();
+    }
+
+    public void Reset() {
+        this.state = CellState.None;
+        this.Letter = default(char);
+        StateHasChanged();
+    }
+}

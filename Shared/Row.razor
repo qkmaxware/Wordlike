@@ -1,0 +1,109 @@
+@using System.Text;
+@implements IDisposable 
+
+<div class="w3-center no-select">
+    <CascadingValue Value="this">
+        @for (var i = 0; i < LetterCount; i++) {
+            <Cell></Cell>
+        }
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public int LetterCount {get; set;}
+    private int activeLetter = 0;
+    private List<Cell> cells = new List<Cell>();
+
+    [CascadingParameter] public Grid? Owner {get; set;}
+
+    public string GetWord() {
+        StringBuilder sb = new StringBuilder();
+        for (var i = 0; i < cells.Count; i++) {
+            sb.Append(cells[i].Letter);
+        }
+        return sb.ToString();
+    }
+
+    public Cell? ActiveCell => activeLetter >= 0 && activeLetter < cells.Count ? cells[activeLetter] : null;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Owner?.AddRow(this);
+    }
+
+    public void Dispose() {
+        Owner?.RemoveRow(this);
+    }
+
+    public void AddCell(Cell c) {
+        this.cells.Add(c);
+    }
+
+    public void RemoveCell(Cell c) {
+        this.cells.Remove(c);
+    }
+
+    public int CellIndex(Cell c) {
+        return this.cells.IndexOf(c);
+    }
+
+    public void Reset() {
+        foreach (var cell in cells)
+            cell.Reset();
+        this.activeLetter = 0;
+        StateHasChanged();
+    }
+
+    public RowStatus Status => activeLetter >= LetterCount ? RowStatus.RowComplete : RowStatus.LettersRemaining;
+    public RowStatus PrevLetter() {
+        if (activeLetter > 0)
+            activeLetter --;
+        if (activeLetter >= (LetterCount - 1)) {
+            return RowStatus.RowComplete;
+        } else {
+            return RowStatus.LettersRemaining;
+        }
+    }
+    public RowStatus NextLetter() {
+        if (activeLetter < LetterCount)
+            activeLetter++;
+        if (activeLetter >= LetterCount) {
+            return RowStatus.RowComplete;
+        } else {
+            return RowStatus.LettersRemaining;
+        }
+    }
+
+    public bool Validate(string? answer) {
+        bool valid = true;
+
+        foreach (var cell in cells) {
+            cell.SetState(CellState.None); // Clear state
+        }
+        if (answer == null) {
+            return false;
+        }
+
+        for (var i = 0; i < this.LetterCount; i++) {
+            var entered = cells[i].Letter;
+            var correct = answer.Length > i ? (char?)answer[i] : (char?)null;
+            if (correct.HasValue && correct.Value == entered) {
+                // Correct value in the correct spot
+                cells[i].SetState(CellState.RightLetterRightPlace);
+                valid &= true;
+            } else {
+                // Not correct, check if the entered letter appears anywhere
+                if (answer.Contains(entered)) {
+                    // Letter does appear somewhere
+                    cells[i].SetState(CellState.RightLetterWrongPlace);
+                } else {
+                    // Letter does not appear somewhere
+                    cells[i].SetState(CellState.WrongLetter);
+                }
+                valid &= false;
+            }
+        }
+
+        return valid;
+    }
+}

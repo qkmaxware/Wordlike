@@ -1,0 +1,14 @@
+.cell {
+    display: inline-block; 
+    width: 64px; 
+    height: 64px; 
+    line-height: 64px; 
+    margin: 4px; 
+    font-size: 150%;
+    text-align: center;
+    color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(255, 246, 232);
+}

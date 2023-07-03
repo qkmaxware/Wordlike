@@ -1,0 +1,7 @@
+.grid {
+    outline: none;
+    cursor: pointer;
+}
+.grid:focus {
+    outline: none;
+}
