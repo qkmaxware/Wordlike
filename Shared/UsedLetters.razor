@@ -1,25 +1,51 @@
 <div class="w3-center">
 @for (var i = 0; i < letters.Length; i++) {
     var letter = letters[i];
-    <button class="w3-button w3-round @(used.Contains(letter) ? "w3-dark-gray" : "w3-gray")" style="margin: 2px;" @onclick=@(() => OnLetterPressed?.Invoke(used.Contains(letter) ? LetterState.Used : LetterState.Unused, char.ToLower(letter)))>@letter</button>
+    <button class="w3-button w3-round @(right.Contains(letter) ? "correct" : (almost.Contains(letter) ? "almost" : (used.Contains(letter) ? "wrong" : "w3-gray")))" style="margin: 2px;" @onclick=@(() => OnLetterPressed?.Invoke(used.Contains(letter) ? LetterState.Used : LetterState.Unused, char.ToLower(letter)))>@letter</button>
+}
+@if (OnBackspace != null) {
+<button class="w3-button w3-round w3-blue" style="margin: 2px;" @onclick=OnBackspace>⌫</button>
+}
+@if (OnEnter != null) {
+<button class="w3-button w3-round w3-blue" style="margin: 2px;" @onclick=OnEnter>⏎</button>
 }
 </div>
 
 @code {
     private HashSet<char> used = new HashSet<char>();
+    private HashSet<char> almost = new HashSet<char>();
+    private HashSet<char> right = new HashSet<char>();
     private char[] letters = new char[] {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     };
 
     [Parameter] public Action<LetterState, char>? OnLetterPressed {get; set;}
+    [Parameter] public Action? OnBackspace {get; set;}
+    [Parameter] public Action? OnEnter {get; set;}
 
     public void Reset() {
         this.used.Clear();
+        this.almost.Clear();
+        this.right.Clear();
         StateHasChanged();
     }
     public void MarkUsed(string letters) {
         foreach (var letter in letters) {
             used.Add(char.ToUpper(letter));
+        }
+        StateHasChanged();
+    }
+
+    public void MarkPotentialLetters(string letters) {
+        foreach (var letter in letters) {
+            almost.Add(char.ToUpper(letter));
+        }
+        StateHasChanged();
+    }
+
+    public void MarkCorrectLetters(string letters) {
+        foreach (var letter in letters) {
+            right.Add(char.ToUpper(letter));
         }
         StateHasChanged();
     }

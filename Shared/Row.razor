@@ -24,6 +24,26 @@
         return sb.ToString();
     }
 
+    public string GetLettersInIncorrectSpots() {
+        StringBuilder sb = new StringBuilder();
+        for (var i = 0; i < cells.Count; i++) {
+            if (cells[i].State == CellState.RightLetterWrongPlace) {
+                sb.Append(cells[i].Letter);
+            }
+        }
+        return sb.ToString();
+    }
+
+    public string GetLettersInCorrectSpots() {
+        StringBuilder sb = new StringBuilder();
+        for (var i = 0; i < cells.Count; i++) {
+            if (cells[i].State == CellState.RightLetterRightPlace) {
+                sb.Append(cells[i].Letter);
+            }
+        }
+        return sb.ToString();
+    }
+
     public Cell? ActiveCell => activeLetter >= 0 && activeLetter < cells.Count ? cells[activeLetter] : null;
 
     protected override void OnInitialized() {

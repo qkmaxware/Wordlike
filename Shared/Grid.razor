@@ -5,7 +5,7 @@
     }
 </CascadingValue>
 </div>
-<UsedLetters @ref=letters OnLetterPressed="@pressCharUi"></UsedLetters>
+<UsedLetters @ref=letters OnLetterPressed="@pressCharUi" OnBackspace=@pressBackspaceUi OnEnter=@pressEnterUi></UsedLetters>
 
 @code {
     [Parameter]public int LetterCount {get; set;} = 5;
@@ -65,6 +65,45 @@
         row.ActiveCell?.SetLetter(letter);
         row.NextLetter();
     }
+    public void pressBackspaceUi() {
+        if (State != GameState.Playing)
+            return;
+
+        var row = this.ActiveRow;
+        if (row == null)
+            return;
+        row.PrevLetter();
+        row.ActiveCell?.SetLetter(default(char));
+    }
+    public void pressEnterUi() {
+        if (State != GameState.Playing)
+            return;
+
+        var row = this.ActiveRow;
+        if (row == null)
+            return;
+        
+        confirmRow(row);
+    }
+    private void confirmRow(Row row) {
+        if (row.Status == RowStatus.RowComplete) {
+            var isValid = row.Validate(this.word);
+            Console.WriteLine("word was " + row.GetWord() + " with correct letters " + row.GetLettersInIncorrectSpots() + " and in correct spots " + row.GetLettersInCorrectSpots());
+            letters?.MarkUsed(row.GetWord());
+            letters?.MarkPotentialLetters(row.GetLettersInIncorrectSpots());
+            letters?.MarkCorrectLetters(row.GetLettersInCorrectSpots());
+            if (isValid) {
+                // Game is done congrats!! 
+                victory();
+            } else {
+                if (hasNextRow()) {
+                    this.rowIndex++;
+                } else {
+                    defeat();
+                }
+            }
+        }
+    }
     public void pressChar(KeyboardEventArgs e) {
         if (State != GameState.Playing)
             return;
@@ -76,20 +115,7 @@
             return;
         
         if (e.Key == "Enter") {
-            if (row.Status == RowStatus.RowComplete) {
-                var isValid = row.Validate(this.word);
-                letters?.MarkUsed(row.GetWord());
-                if (isValid) {
-                    // Game is done congrats!! 
-                    victory();
-                } else {
-                    if (hasNextRow()) {
-                        this.rowIndex++;
-                    } else {
-                        defeat();
-                    }
-                }
-            }
+            confirmRow(row);
         } else if (e.Key == "Backspace") {
             row.PrevLetter();
             row.ActiveCell?.SetLetter(default(char));

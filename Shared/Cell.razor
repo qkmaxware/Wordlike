@@ -1,6 +1,6 @@
 @implements IDisposable 
 
-<div class="w3-animate-zoom cell no-select" style="@(style);">
+<div class="w3-animate-zoom cell no-select @style">
     @if(char.IsLetter(Letter)) {
         <text>@char.ToUpper(Letter)</text>
     } else {
@@ -10,13 +10,13 @@
 
 @code {
     public char Letter {get; private set;}
-    private CellState state;
+    public CellState State {get; private set;}
     private string style {
         get {
-            return state switch {
-                CellState.RightLetterWrongPlace => "background-color: darkgoldenrod;",
-                CellState.RightLetterRightPlace => "background-color: green;",
-                CellState.WrongLetter           => "background-color: red;",
+            return State switch {
+                CellState.RightLetterWrongPlace => "almost",
+                CellState.RightLetterRightPlace => "correct",
+                CellState.WrongLetter           => "wrong",
                 _                               => "",
             };
         }
@@ -35,7 +35,7 @@
     public int CellIndex => Owner?.CellIndex(this) ?? -1;
 
     public void SetState(CellState state) {
-        this.state = state;
+        this.State = state;
         StateHasChanged();
     }
 
@@ -45,7 +45,7 @@
     }
 
     public void Reset() {
-        this.state = CellState.None;
+        this.State = CellState.None;
         this.Letter = default(char);
         StateHasChanged();
     }
