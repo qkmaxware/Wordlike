@@ -54,10 +54,6 @@
         if (State != GameState.Playing)
             return;
 
-        if (state != LetterState.Unused) {
-            return;
-        }
-
         var row = this.ActiveRow;
         if (row == null)
             return;
