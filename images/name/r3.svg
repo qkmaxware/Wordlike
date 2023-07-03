@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="r3.svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 7.9497792 12.860104"
+   height="12.860104mm"
+   width="7.9497795mm">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="-8"
+     inkscape:window-height="987"
+     inkscape:window-width="1680"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="-2.8083551"
+     inkscape:cx="26.641985"
+     inkscape:zoom="1.4"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-60.604387,-50.254234)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <path
+       d="m 67.514482,50.393194 c 2.037883,2.610672 0.546013,3.616912 0,5.053086 -0.328451,-0.18528 -0.627425,-0.27792 -0.896923,-0.27792 -0.859025,0 -1.288537,0.656901 -1.288537,1.970704 v 5.975274 h -4.724635 v -6.88483 c 0,-1.819111 0.496887,-3.267662 1.49066,-4.345653 0.993773,-1.086414 2.320208,-1.629621 3.979305,-1.629621 0.37056,0 0.850603,0.04632 1.44013,0.13896 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.8718px;line-height:1.25;font-family:'Bauhaus 93';-inkscape-font-specification:'Bauhaus 93, ';letter-spacing:0px;word-spacing:0px;fill:#ff2a7f;fill-opacity:1;stroke:none;stroke-width:0.264582"
+       id="path841"
+       sodipodi:nodetypes="ccssccscsc" />
+  </g>
+</svg>

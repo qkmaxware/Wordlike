@@ -1,0 +1,28 @@
+/* /Shared/Cell.razor.rz.scp.css */
+.cell[b-pf0rsfdugc] {
+    display: inline-block; 
+    width: 64px; 
+    height: 64px; 
+    line-height: 64px; 
+    margin: 4px; 
+    font-size: 150%;
+    text-align: center;
+    color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(255, 246, 232);
+}
+/* /Shared/Grid.razor.rz.scp.css */
+.grid[b-9g2m4hl4vh] {
+    outline: none;
+    cursor: pointer;
+}
+.grid:focus[b-9g2m4hl4vh] {
+    outline: none;
+}
+/* /Shared/Logo.razor.rz.scp.css */
+
+img[b-jk46y4o4c1] {
+    vertical-align: baseline;
+}
