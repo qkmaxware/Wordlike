@@ -35,7 +35,7 @@
       "System.Runtime.InteropServices.JavaScript.dll": "sha256-9CCgfv\/Ww46emzTP29kDrlqGF4Kz8nvSJdJyhMjeWOg=",
       "System.Text.Encodings.Web.dll": "sha256-7NGC79J4RiksgTNfAgMsn2d7dJR6GYJAXrfADrBaxXc=",
       "System.Text.Json.dll": "sha256-gKcvXkFmps69PLLR5PfzASVmmoXHp3te5dnDpKugWeI=",
-      "Wordle.dll": "sha256-OLQLgKGmYJMJCQkTCwSQgQ8t82O5Q8qEXQEgM6wYdhI="
+      "Wordle.dll": "sha256-r2Qejm72IsYeCGMxIeCv9A5y0MMjCqoIswtW0tgpUIc="
     },
     "extensions": null,
     "lazyAssembly": null,
