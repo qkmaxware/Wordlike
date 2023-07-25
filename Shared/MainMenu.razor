@@ -32,6 +32,9 @@
             <div>@resultsText</div>
             @if (!string.IsNullOrEmpty(answerText)) {
                 <a class="w3-large" target="_blank" href="https://www.merriam-webster.com/dictionary/@answerText">@answerText</a>
+                <p>
+                Is this word wrong or inappropriate? You may request a <a target="_blank" href="https://github.com/qkmaxware/Wordlike/issues/new?assignees=&labels=&projects=&template=word-removal-request.md&title=Remove+Word:+@answerText">removal here</a>.
+                </p>
             }
             <span class="w3-button w3-display-topright" @onclick=closeResultsScreen>&times;</span>
         </header>
