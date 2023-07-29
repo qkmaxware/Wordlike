@@ -27,6 +27,12 @@ img[b-jk46y4o4c1] {
     vertical-align: baseline;
 }
 
+sub[b-jk46y4o4c1] {
+    color: white;
+    font-style: italic;
+    font-size: small;
+}
+
 @media only screen and (max-width: 480px) {
     h1[b-jk46y4o4c1] {
         font-size: 50%;
