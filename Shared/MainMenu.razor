@@ -1,5 +1,8 @@
 @inject Dictionary english
 @inject IJSRuntime js
+@inject NavigationManager nav
+@using System.Linq
+@using System.Web
 
 <Logo></Logo>
 <div class="@(state == MenuState.Playing ? "w3-hide" : "w3-show")">
@@ -34,6 +37,10 @@
                 <a class="w3-large" target="_blank" href="https://www.merriam-webster.com/dictionary/@answerText">@answerText</a>
                 <p>
                 Is this word wrong or inappropriate? You may request a <a target="_blank" href="https://github.com/qkmaxware/Wordlike/issues/new?assignees=&labels=&projects=&template=word-removal-request.md&title=Remove+Word:+@answerText">removal here</a>.
+                </p>
+                <p>
+                Challenge a friend to solve this word by sending them the link below.
+                <button class="copy-field" title="click to copy link" onclick="clipboard('https://qkmaxware.github.io/Wordlike/?autoplay=@(encodeBase64String(answerText))')">https://qkmaxware.github.io/Wordlike/?autoplay=@(encodeBase64String(answerText))</button>
                 </p>
             }
             <span class="w3-button w3-display-topright" @onclick=closeResultsScreen>&times;</span>
@@ -95,17 +102,21 @@
     private void playRandomWithLetters(int letters) {
         var word = english.GetRandomWordOfLength(letters);
         if (word != null) {
-            gameGrid?.Reconfigure(letterCount: letters, retries: letters + 1);
-            gameGrid?.Start(word);
-            this.state = MenuState.Playing;
+            playWithWord(word);
         }
+    }
+
+    private void playWithWord(string word) {
+        var letters = word.Length;
+        gameGrid?.Reconfigure(letterCount: letters, retries: letters + 1);
+        gameGrid?.Start(word);
+        this.state = MenuState.Playing;
+        StateHasChanged();
     }
 
     private void quickPlay() {
         var word = english.Get5LetterWordOfTheDay();
-        gameGrid?.Reconfigure(letterCount: 5, retries: 6);
-        gameGrid?.Start(word);
-        this.state = MenuState.Playing;
+        playWithWord(word);
     }
 
     private bool showResultsScreen = false;
@@ -115,6 +126,7 @@
     private Statistics playerStats = new Statistics();
     protected override async Task OnAfterRenderAsync(bool first) {
         if (first) {
+            // Load stats
             var stats = await js.InvokeAsync<string>("window.localStorage.getItem", "wordlike.statistics.json");
             if (!string.IsNullOrEmpty(stats)) {
                 try {
@@ -124,7 +136,34 @@
                     this.playerStats = new Statistics();
                 }
             }
+
+            // Autoplay
+            string? autoplay_base64;
+            var uri = nav.ToAbsoluteUri(nav.Uri);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var query_dict = new Dictionary<string,string>();
+            if (query != null) {
+                foreach (var key in query.AllKeys) {
+                    if (key == null)
+                        continue;
+                    var value = query[key];
+                    if (value == null)
+                        continue;
+                    query_dict.Add(key, value);
+                }
+            }
+            if (query_dict.TryGetValue("autoplay", out autoplay_base64)) {
+                var word = decodeBase64String(autoplay_base64);
+                playWithWord(word);
+            }
         }
+    }
+
+    private string decodeBase64String(string base64) {
+        return System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+    }
+    private string encodeBase64String(string word) {
+        return HttpUtility.UrlEncode(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(word)));
     }
 
     private void saveStats() {

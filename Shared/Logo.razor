@@ -7,4 +7,11 @@
     <img src="images/name/i6.svg" class="w3-animate-zoom">
     <img src="images/name/k7.svg" class="w3-animate-zoom">
     <img src="images/name/e8.svg" class="w3-animate-zoom">
+    @if (IsDebug) {
+        <sub>DEBUG</sub>
+    }
 </h1>
+
+@code {
+    [Parameter] public bool IsDebug {get; set;}
+}

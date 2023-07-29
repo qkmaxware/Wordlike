@@ -3,6 +3,12 @@ img {
     vertical-align: baseline;
 }
 
+sub {
+    color: white;
+    font-style: italic;
+    font-size: small;
+}
+
 @media only screen and (max-width: 480px) {
     h1 {
         font-size: 50%;

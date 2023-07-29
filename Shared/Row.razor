@@ -97,6 +97,7 @@
     public bool Validate(string? answer) {
         bool valid = true;
 
+        // Clear the old state
         foreach (var cell in cells) {
             cell.SetState(CellState.None); // Clear state
         }
@@ -104,6 +105,18 @@
             return false;
         }
 
+        // Count how many of each letter is in the answer
+        Dictionary<char, int> letter_count = new Dictionary<char, int>();
+        foreach (char c in answer){
+            if (letter_count.ContainsKey(c)) {
+                letter_count[c] += 1;
+            } else {
+                letter_count[c] = 1;
+            }
+        }
+
+        // Verify
+        // Correct letters first
         for (var i = 0; i < this.LetterCount; i++) {
             var entered = cells[i].Letter;
             var correct = answer.Length > i ? (char?)answer[i] : (char?)null;
@@ -111,11 +124,23 @@
                 // Correct value in the correct spot
                 cells[i].SetState(CellState.RightLetterRightPlace);
                 valid &= true;
-            } else {
+                letter_count[correct.Value] -= 1; // Used up this letter
+            } 
+        }
+        // Incorrect letters next
+        for (var i = 0; i < this.LetterCount; i++) {
+            var entered = cells[i].Letter;
+            var correct = answer.Length > i ? (char?)answer[i] : (char?)null;
+            if (!correct.HasValue || correct.Value != entered) {
                 // Not correct, check if the entered letter appears anywhere
                 if (answer.Contains(entered)) {
-                    // Letter does appear somewhere
-                    cells[i].SetState(CellState.RightLetterWrongPlace);
+                    // Letter does appear somewhere, but not here
+                    if (letter_count[entered] > 0) {
+                        cells[i].SetState(CellState.RightLetterWrongPlace); 
+                        letter_count[entered] -= 1; // Used up this letter 
+                    } else {
+                        cells[i].SetState(CellState.WrongLetter);
+                    }
                 } else {
                     // Letter does not appear somewhere
                     cells[i].SetState(CellState.WrongLetter);

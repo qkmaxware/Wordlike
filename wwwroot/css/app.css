@@ -127,3 +127,14 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+.copy-field::before {
+    content: '📋';
+    text-align: left;
+}
+.copy-field {
+    border-radius: 8px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -1,0 +1,39 @@
+@page "/debug/{Word}"
+
+<Logo IsDebug=true></Logo>
+<div>
+    <Grid @ref=gameGrid ></Grid>
+</div>
+
+@code { 
+    [Parameter]
+    public string? Word { get; set;}
+    private Grid? gameGrid;
+
+    protected override void OnAfterRender(bool first) {
+        if (first) {
+            setup();
+        }
+    }
+
+    protected override Task OnParametersSetAsync () {
+        setup();
+
+        return base.OnParametersSetAsync();
+    }
+
+    private void setup() {
+        if (gameGrid == null)
+            return;
+        if (Word == null)
+            return;
+
+        gameGrid.Reconfigure(letterCount: Word.Length, retries: Word.Length + 1);
+        gameGrid.Start(Word);
+    }
+}
+
+
+
+
+
