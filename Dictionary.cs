@@ -9,9 +9,9 @@ public class Dictionary {
 
     public Dictionary() {
         var files = new string[]{
-            "Wordle.data.words_3letter.json",   // 3 letter
-            "Wordle.data.words_wordle.json",    // 5 letter
-            "Wordle.data.words_7letter.json",   // 7 letter
+            "Wordle.data.words_3letters.json",   // 3 letter
+            "Wordle.data.words_5letters.json",  // 5 letter
+            "Wordle.data.words_7letters.json",   // 7 letter
         };
         foreach (var file in files) {
             Stream? stream = this.GetType().Assembly.GetManifestResourceStream(file);
